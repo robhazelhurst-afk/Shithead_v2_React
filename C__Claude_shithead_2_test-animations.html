@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation Test</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a2e;
+            font-family: Arial, sans-serif;
+        }
+        .test-container {
+            text-align: center;
+            color: white;
+        }
+        .test-card {
+            width: 100px;
+            height: 140px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background: #28a745;
+            color: white;
+        }
+        button:hover {
+            background: #218838;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Animation Engine Test</h1>
+        <div class="test-card" id="testCard">🃏</div>
+        
+        <div>
+            <button id="testShake">Test Shake</button>
+            <button id="testSpin">Test Spin (Burn)</button>
+            <button id="testBounce">Test Bounce</button>
+            <button id="testFlip">Test Flip</button>
+        </div>
+        
+        <div id="status">Click buttons to test animations</div>
+    </div>
+
+    <script type="module">
+        import { Animator } from './js/ui/Animator.js';
+
+        const animator = new Animator();
+        const card = document.getElementById('testCard');
+        const status = document.getElementById('status');
+
+        function updateStatus(message) {
+            status.textContent = message;
+            console.log(message);
+        }
+
+        document.getElementById('testShake').addEventListener('click', async () => {
+            updateStatus('Testing shake animation...');
+            await animator.shake(card, 15);
+            updateStatus('Shake complete! ✓');
+        });
+
+        document.getElementById('testSpin').addEventListener('click', async () => {
+            updateStatus('Testing burn/spin animation...');
+            await animator.burnPile([card]);
+            // Reset card
+            card.style.transform = '';
+            card.style.opacity = '1';
+            updateStatus('Burn complete! ✓');
+        });
+
+        document.getElementById('testBounce').addEventListener('click', async () => {
+            updateStatus('Testing bounce animation...');
+            await animator.celebrate(card);
+            updateStatus('Bounce complete! ✓');
+        });
+
+        document.getElementById('testFlip').addEventListener('click', async () => {
+            updateStatus('Testing flip animation...');
+            await animator.flipCard(card, true);
+            updateStatus('Flip complete! ✓');
+        });
+
+        updateStatus('Animation engine loaded successfully! Click buttons to test.');
+        console.log('Animator:', animator);
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+/* Animation Keyframes */
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 20px rgba(76, 175, 80, 0);
+    }
+}
+
+@keyframes burn-flash {
+    0% {
+        filter: brightness(1) hue-rotate(0deg);
+        box-shadow: 0 0 0 rgba(255, 100, 0, 0);
+    }
+    20% {
+        filter: brightness(2) hue-rotate(20deg);
+        box-shadow: 0 0 30px rgba(255, 100, 0, 1);
+    }
+    40% {
+        filter: brightness(3) hue-rotate(-20deg);
+        box-shadow: 0 0 50px rgba(255, 50, 0, 1);
+    }
+    60% {
+        filter: brightness(2.5) hue-rotate(10deg);
+        box-shadow: 0 0 40px rgba(255, 150, 0, 1);
+    }
+    80% {
+        filter: brightness(2) hue-rotate(0deg);
+        box-shadow: 0 0 30px rgba(255, 100, 0, 0.8);
+    }
+    100% {
+        filter: brightness(1) hue-rotate(0deg);
+        box-shadow: 0 0 0 rgba(255, 100, 0, 0);
+    }
+}
+
+@keyframes burn-scale-spin {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    30% {
+        transform: scale(1.2) rotate(90deg);
+        opacity: 1;
+    }
+    60% {
+        transform: scale(1.8) rotate(270deg);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(2.5) rotate(540deg);
+        opacity: 0;
+    }
+}
+
+@keyframes slide-in-top {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-out-top {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes scale-out {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+}
+
+@keyframes flip-card {
+    0% {
+        transform: rotateY(0deg);
+    }
+    50% {
+        transform: rotateY(90deg);
+    }
+    100% {
+        transform: rotateY(180deg);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-10px);
+    }
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+/* Animation Classes */
+
+.player-area.active {
+    animation: pulse 2s infinite;
+}
+
+.card.burning {
+    animation: burn-flash 600ms ease-in-out;
+    animation-iteration-count: 2;
+}
+
+.card.burn-scale {
+    animation: burn-scale-spin 1000ms cubic-bezier(0.4, 0.0, 0.6, 1) forwards;
+}
+
+.card.flipping {
+    animation: flip-card var(--anim-slow) var(--ease-in-out);
+}
+
+.card.shake {
+    animation: shake 300ms var(--ease-in-out);
+}
+
+.status-message.show {
+    animation: slide-in-top var(--anim-normal) var(--ease-out);
+}
+
+.status-message.hide {
+    animation: slide-out-top var(--anim-normal) var(--ease-out);
+}
+
+.modal {
+    animation: fade-in var(--anim-normal) var(--ease-out);
+}
+
+.modal.hiding {
+    animation: fade-out var(--anim-normal) var(--ease-out);
+}
+
+.modal-content {
+    animation: scale-in var(--anim-slow) var(--ease-bounce);
+}
+
+/* Transition Properties */
+
+.card {
+    transition: transform var(--anim-fast) var(--ease-out),
+                box-shadow var(--anim-fast) var(--ease-out),
+                border-color var(--anim-fast) var(--ease-out);
+}
+
+.btn {
+    transition: all var(--anim-fast) var(--ease-out);
+}
+
+.player-area {
+    transition: box-shadow var(--anim-normal) var(--ease-out);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -1,0 +1,155 @@
+/* Card Styles */
+.card {
+    width: var(--card-width);
+    height: var(--card-height);
+    background: var(--card-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: transform var(--anim-fast) var(--ease-out),
+                box-shadow var(--anim-fast) var(--ease-out),
+                margin-left 0.2s ease-out;
+    z-index: var(--z-cards);
+    opacity: 1 !important; /* Force full opacity - no transparency */
+}
+
+.card:hover:not(.disabled):not(.card-back) {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    z-index: var(--z-cards-hover);
+}
+
+.card.selected {
+    transform: translateY(-20px);
+    border: 3px solid var(--gold-accent);
+    box-shadow: var(--shadow-gold);
+    z-index: var(--z-cards-selected);
+}
+
+.card.disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed;
+}
+
+/* Card Face */
+.card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.card-rank {
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.card-suit {
+    font-size: 32px;
+    line-height: 1;
+    margin-top: 4px;
+}
+
+/* Card Colors */
+.card.red .card-rank,
+.card.red .card-suit {
+    color: var(--card-red);
+}
+
+.card.black .card-rank,
+.card.black .card-suit {
+    color: var(--card-black);
+}
+
+/* Card Back */
+.card-back {
+    background: linear-gradient(135deg, var(--card-back-gradient-start) 0%, var(--card-back-gradient-end) 100%);
+    color: white;
+    cursor: default;
+}
+
+.card-back .card-content {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Corner Pips */
+.card-corner {
+    position: absolute;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.card-corner.top-left {
+    top: 5px;
+    left: 5px;
+}
+
+.card-corner.bottom-right {
+    bottom: 5px;
+    right: 5px;
+    transform: rotate(180deg);
+}
+
+/* Special Card Effects */
+.card[data-rank="2"] {
+    box-shadow: var(--shadow-md), var(--shadow-glow-blue);
+}
+
+.card[data-rank="7"].active {
+    box-shadow: var(--shadow-md), var(--shadow-glow-green);
+}
+
+.card[data-rank="10"] {
+    box-shadow: var(--shadow-md), var(--shadow-glow-orange);
+}
+
+.card[data-rank="14"] {
+    /* Ace - subtle purple glow */
+    box-shadow: var(--shadow-md), 0 0 15px rgba(156, 39, 176, 0.3);
+}
+
+/* Stacked Cards Effect (for discard pile) */
+.card.stacked {
+    position: absolute;
+    opacity: 1 !important; /* No transparency in stacks */
+}
+
+.card.stacked:nth-child(1) {
+    transform: translate(-2px, -2px);
+    z-index: 1;
+}
+
+.card.stacked:nth-child(2) {
+    transform: translate(0, 0);
+    z-index: 2;
+}
+
+.card.stacked:nth-child(3) {
+    transform: translate(2px, 2px);
+    z-index: 3;
+}
+
+/* Empty Slot Placeholder */
+.empty-slot {
+    width: var(--card-width);
+    height: var(--card-height);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+}

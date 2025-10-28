@@ -1,0 +1,72 @@
+/* CSS Variables */
+:root {
+    /* Colors - Background */
+    --bg-gradient-start: #1e3c72;
+    --bg-gradient-end: #2a5298;
+    --table-green: rgba(10, 90, 10, 0.9);
+    --table-green-light: rgba(20, 110, 20, 0.95);
+    
+    /* Colors - Cards */
+    --card-white: #ffffff;
+    --card-red: #DC143C;
+    --card-black: #000000;
+    --card-back-gradient-start: #8B0000;
+    --card-back-gradient-end: #DC143C;
+    
+    /* Colors - Accents */
+    --gold-accent: #FFD700;
+    --green-action: #4CAF50;
+    --red-warning: #f44336;
+    --blue-info: #2196F3;
+    --purple-special: #9C27B0;
+    
+    /* Colors - UI */
+    --text-light: #ffffff;
+    --text-dark: #333333;
+    --overlay: rgba(0, 0, 0, 0.7);
+    --border-light: rgba(255, 255, 255, 0.2);
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.6);
+    --shadow-gold: 0 8px 16px rgba(255, 215, 0, 0.5);
+    --shadow-glow-blue: 0 0 20px rgba(0, 100, 255, 0.4);
+    --shadow-glow-orange: 0 0 20px rgba(255, 100, 0, 0.4);
+    --shadow-glow-green: 0 0 20px rgba(0, 255, 0, 0.4);
+    
+    /* Spacing */
+    --card-width: 80px;
+    --card-height: 112px;
+    --card-gap: 10px;
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    --spacing-xs: 5px;
+    --spacing-sm: 10px;
+    --spacing-md: 20px;
+    --spacing-lg: 30px;
+    --spacing-xl: 40px;
+    
+    /* Animation Durations */
+    --anim-instant: 100ms;
+    --anim-fast: 150ms;
+    --anim-normal: 250ms;
+    --anim-slow: 400ms;
+    --anim-very-slow: 600ms;
+    
+    /* Easing Functions */
+    --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-in: cubic-bezier(0.42, 0, 1, 1);
+    
+    /* Z-Index Layers */
+    --z-background: 0;
+    --z-table: 10;
+    --z-cards: 20;
+    --z-cards-hover: 30;
+    --z-cards-selected: 40;
+    --z-ui: 50;
+    --z-modal: 100;
+}

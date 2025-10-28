@@ -1,0 +1,163 @@
+/* Responsive Design */
+
+/* Tablet */
+@media (max-width: 1199px) {
+    :root {
+        --card-width: 70px;
+        --card-height: 98px;
+        --spacing-md: 15px;
+        --spacing-lg: 20px;
+    }
+
+    #game-container {
+        padding: var(--spacing-md);
+    }
+
+    .card-rank {
+        font-size: 24px;
+    }
+
+    .card-suit {
+        font-size: 28px;
+    }
+
+    #center-area {
+        gap: var(--spacing-md);
+    }
+
+    .card-zones {
+        gap: var(--spacing-md);
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    :root {
+        --card-width: 60px;
+        --card-height: 84px;
+        --card-gap: 8px;
+        --spacing-sm: 8px;
+        --spacing-md: 12px;
+        --spacing-lg: 15px;
+    }
+
+    body {
+        padding: var(--spacing-sm);
+    }
+
+    #game-container {
+        padding: var(--spacing-md);
+        min-height: auto;
+    }
+
+    #status-bar {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        text-align: center;
+    }
+
+    #status-message {
+        font-size: 16px;
+    }
+
+    #game-timer {
+        font-size: 14px;
+    }
+
+    .card-zones {
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+
+    .card-rank {
+        font-size: 20px;
+    }
+
+    .card-suit {
+        font-size: 24px;
+    }
+
+    #center-area {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md) 0;
+    }
+
+    #controls {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .btn {
+        width: 100%;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .modal-content {
+        padding: var(--spacing-md);
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+    .modal-buttons .btn {
+        width: 100%;
+    }
+
+    /* Disable hover effects on mobile */
+    .card:hover:not(.disabled):not(.card-back) {
+        transform: none;
+        box-shadow: var(--shadow-md);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    :root {
+        --card-width: 50px;
+        --card-height: 70px;
+        --card-gap: 5px;
+    }
+
+    .card-rank {
+        font-size: 18px;
+    }
+
+    .card-suit {
+        font-size: 20px;
+    }
+
+    .player-label {
+        font-size: 14px;
+    }
+
+    #status-message {
+        font-size: 14px;
+    }
+
+    #game-timer {
+        font-size: 12px;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+    #game-container {
+        max-width: 100%;
+    }
+
+    .player-area {
+        padding: var(--spacing-sm);
+    }
+
+    .card-zones {
+        min-height: 90px;
+    }
+
+    #center-area {
+        padding: var(--spacing-sm) 0;
+        min-height: 120px;
+    }
+}

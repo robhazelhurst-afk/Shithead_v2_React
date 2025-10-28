@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ Server Required!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #dc3545;
+            margin-top: 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d1ecf1;
+            border-left: 4px solid #0dcaf0;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .code {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .steps {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .steps ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .steps li {
+            margin: 10px 0;
+        }
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #28a745;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #218838;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚠️ Local Web Server Required!</h1>
+        
+        <div class="warning">
+            <strong>You can't open index.html directly!</strong><br>
+            Modern browsers block ES6 modules from <code>file://</code> URLs for security reasons.
+        </div>
+
+        <div class="steps">
+            <h2>✅ How to Run the Game (3 Steps):</h2>
+            <ol>
+                <li>Close this browser tab</li>
+                <li><strong>Double-click</strong> the file: <code>START_SERVER.bat</code></li>
+                <li>A command window opens and shows: <code>http://localhost:8000</code></li>
+                <li>Open your browser to: <code>http://localhost:8000</code></li>
+            </ol>
+        </div>
+
+        <div class="success">
+            <strong>What if START_SERVER.bat doesn't work?</strong><br>
+            You need Python or Node.js installed:
+            <ul>
+                <li><a href="https://www.python.org/downloads/" target="_blank">Download Python</a> (recommended)</li>
+                <li><a href="https://nodejs.org/" target="_blank">Download Node.js</a></li>
+            </ul>
+        </div>
+
+        <h3>Manual Commands:</h3>
+        
+        <p><strong>With Python:</strong></p>
+        <div class="code">
+cd C:\Claude\shithead_2<br>
+python -m http.server 8000
+        </div>
+
+        <p><strong>With Node.js:</strong></p>
+        <div class="code">
+cd C:\Claude\shithead_2<br>
+npx http-server -p 8000
+        </div>
+
+        <p><strong>Then open:</strong></p>
+        <div class="code">
+http://localhost:8000
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="http://localhost:8000" class="btn">Try http://localhost:8000 →</a>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <p style="text-align: center; color: #666;">
+            <small>
+                For more help, see: <strong>QUICK_START.md</strong> or <strong>README_FIRST.txt</strong>
+            </small>
+        </p>
+    </div>
+</body>
+</html>

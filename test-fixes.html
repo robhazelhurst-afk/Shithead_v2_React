@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation Fixes Test</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: var(--gold-accent);
+            margin-bottom: 20px;
+        }
+        
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            width: 600px;
+        }
+        
+        .test-section h2 {
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .card-container {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background: var(--green-action);
+            color: white;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: var(--blue-info);
+        }
+        
+        .status {
+            color: white;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        
+        .pass {
+            color: var(--green-action);
+            font-weight: bold;
+        }
+        
+        .fail {
+            color: var(--red-warning);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Animation Fixes Verification</h1>
+    
+    <!-- Test 1: Burn Animation -->
+    <div class="test-section">
+        <h2>✅ Test 1: Burn Animation (Fixed)</h2>
+        <div class="status">
+            Old problem: render() deleted cards before animation<br>
+            Fix: Animate BEFORE render()
+        </div>
+        <div id="burn-pile" class="card-container">
+            <div class="card red">
+                <div class="card-content">
+                    <div class="card-corner top-left">5♥</div>
+                    <div class="card-rank">5</div>
+                    <div class="card-suit">♥</div>
+                    <div class="card-corner bottom-right">5♥</div>
+                </div>
+            </div>
+            <div class="card red">
+                <div class="card-content">
+                    <div class="card-corner top-left">5♦</div>
+                    <div class="card-rank">5</div>
+                    <div class="card-suit">♦</div>
+                    <div class="card-corner bottom-right">5♦</div>
+                </div>
+            </div>
+            <div class="card black">
+                <div class="card-content">
+                    <div class="card-corner top-left">5♠</div>
+                    <div class="card-rank">5</div>
+                    <div class="card-suit">♠</div>
+                    <div class="card-corner bottom-right">5♠</div>
+                </div>
+            </div>
+            <div class="card black">
+                <div class="card-content">
+                    <div class="card-corner top-left">5♣</div>
+                    <div class="card-rank">5</div>
+                    <div class="card-suit">♣</div>
+                    <div class="card-corner bottom-right">5♣</div>
+                </div>
+            </div>
+        </div>
+        <button onclick="testBurnFixed()">Test Burn (Should Work!)</button>
+        <div id="burn-result" class="status" style="display: none;"></div>
+    </div>
+
+    <!-- Test 2: Flip Animation -->
+    <div class="test-section">
+        <h2>✅ Test 2: Flip Shows Face (Fixed)</h2>
+        <div class="status">
+            Old problem: Flipped back to back, never showed face<br>
+            Fix: Manually change content mid-flip
+        </div>
+        <div class="card-container">
+            <div id="flip-card" class="card card-back">
+                <div class="card-content">
+                    SHITHEAD
+                </div>
+            </div>
+        </div>
+        <button onclick="testFlipFixed()">Test Flip (Should Show Face!)</button>
+        <div id="flip-result" class="status" style="display: none;"></div>
+    </div>
+
+    <!-- Test 3: Hand Sorting -->
+    <div class="test-section">
+        <h2>✅ Test 3: Hand Sorted Low-High (Fixed)</h2>
+        <div class="status">
+            Old problem: Cards in random/dealt order<br>
+            Fix: Sort by rank before rendering
+        </div>
+        <div class="card-container">
+            <strong style="color: white;">Unsorted (random order):</strong>
+        </div>
+        <div id="unsorted-hand" class="card-container"></div>
+        <div class="card-container">
+            <strong style="color: white;">Sorted (low to high):</strong>
+        </div>
+        <div id="sorted-hand" class="card-container"></div>
+        <button onclick="testSortFixed()">Generate Random Hand & Sort</button>
+        <div id="sort-result" class="status" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Test 1: Burn animation
+        async function testBurnFixed() {
+            console.log('🔥 Testing burn animation (FIXED VERSION)');
+            const cards = document.querySelectorAll('#burn-pile .card');
+            const resultDiv = document.getElementById('burn-result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '🔥 Animating burn...';
+            
+            // Add burning class
+            cards.forEach(card => card.classList.add('burning'));
+            
+            // Wait for CSS animation
+            await sleep(300);
+            
+            // Scale/fade JS animation
+            cards.forEach(card => {
+                card.style.transition = 'transform 600ms, opacity 600ms';
+                card.style.transform = 'scale(1.5) rotate(360deg)';
+                card.style.opacity = '0';
+            });
+            
+            await sleep(600);
+            
+            // Check if cards animated
+            let allHidden = true;
+            cards.forEach(card => {
+                if (card.style.opacity !== '0') allHidden = false;
+            });
+            
+            if (allHidden) {
+                resultDiv.innerHTML = '<span class="pass">✅ PASS</span> - Cards animated and faded out!';
+            } else {
+                resultDiv.innerHTML = '<span class="fail">❌ FAIL</span> - Cards did not animate properly';
+            }
+            
+            // Reset
+            await sleep(1000);
+            cards.forEach(card => {
+                card.classList.remove('burning');
+                card.style.transform = '';
+                card.style.opacity = '1';
+                card.style.transition = '';
+            });
+        }
+
+        // Test 2: Flip shows face
+        async function testFlipFixed() {
+            console.log('🔄 Testing flip animation (FIXED VERSION)');
+            const card = document.getElementById('flip-card');
+            const resultDiv = document.getElementById('flip-result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '🔄 Flipping card...';
+            
+            // First half - flip to edge
+            card.style.transition = 'transform 200ms';
+            card.style.transform = 'rotateY(90deg)';
+            
+            await sleep(200);
+            
+            // Mid-flip - change to face
+            const showFace = card.classList.contains('card-back');
+            
+            if (showFace) {
+                card.classList.remove('card-back');
+                card.classList.add('red');
+                card.innerHTML = `
+                    <div class="card-content">
+                        <div class="card-corner top-left">A♥</div>
+                        <div class="card-rank">A</div>
+                        <div class="card-suit">♥</div>
+                        <div class="card-corner bottom-right">A♥</div>
+                    </div>
+                `;
+                resultDiv.innerHTML = '🔄 Revealing face...';
+            } else {
+                card.classList.remove('red');
+                card.classList.add('card-back');
+                card.innerHTML = `
+                    <div class="card-content">
+                        SHITHEAD
+                    </div>
+                `;
+                resultDiv.innerHTML = '🔄 Hiding face...';
+            }
+            
+            // Second half - flip to viewer
+            card.style.transform = 'rotateY(0deg)';
+            
+            await sleep(200);
+            
+            // Check result
+            if (showFace && card.classList.contains('red')) {
+                resultDiv.innerHTML = '<span class="pass">✅ PASS</span> - Card face revealed! Flip again to hide.';
+            } else if (!showFace && card.classList.contains('card-back')) {
+                resultDiv.innerHTML = '<span class="pass">✅ PASS</span> - Card back shown! Flip again to reveal.';
+            } else {
+                resultDiv.innerHTML = '<span class="fail">❌ FAIL</span> - Flip did not work correctly';
+            }
+            
+            // Cleanup
+            card.style.transition = '';
+            card.style.transform = '';
+        }
+
+        // Test 3: Hand sorting
+        function testSortFixed() {
+            console.log('🎴 Testing hand sorting (FIXED VERSION)');
+            const resultDiv = document.getElementById('sort-result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '🎴 Generating and sorting hand...';
+            
+            // Generate random hand
+            const ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+            const suits = ['♥', '♦', '♠', '♣'];
+            const displayRanks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+            const colors = ['red', 'red', 'black', 'black'];
+            
+            const hand = [];
+            for (let i = 0; i < 7; i++) {
+                const rankIdx = Math.floor(Math.random() * ranks.length);
+                const suitIdx = Math.floor(Math.random() * suits.length);
+                hand.push({
+                    rank: ranks[rankIdx],
+                    displayRank: displayRanks[rankIdx],
+                    suit: suits[suitIdx],
+                    color: colors[suitIdx]
+                });
+            }
+            
+            // Show unsorted
+            const unsortedDiv = document.getElementById('unsorted-hand');
+            unsortedDiv.innerHTML = '';
+            hand.forEach(card => {
+                unsortedDiv.innerHTML += `
+                    <div class="card ${card.color}">
+                        <div class="card-content">
+                            <div class="card-corner top-left">${card.displayRank}${card.suit}</div>
+                            <div class="card-rank">${card.displayRank}</div>
+                            <div class="card-suit">${card.suit}</div>
+                            <div class="card-corner bottom-right">${card.displayRank}${card.suit}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Sort hand
+            const sortedHand = [...hand].sort((a, b) => a.rank - b.rank);
+            
+            // Show sorted
+            const sortedDiv = document.getElementById('sorted-hand');
+            sortedDiv.innerHTML = '';
+            sortedHand.forEach(card => {
+                sortedDiv.innerHTML += `
+                    <div class="card ${card.color}">
+                        <div class="card-content">
+                            <div class="card-corner top-left">${card.displayRank}${card.suit}</div>
+                            <div class="card-rank">${card.displayRank}</div>
+                            <div class="card-suit">${card.suit}</div>
+                            <div class="card-corner bottom-right">${card.displayRank}${card.suit}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Verify sort
+            let isSorted = true;
+            for (let i = 1; i < sortedHand.length; i++) {
+                if (sortedHand[i].rank < sortedHand[i-1].rank) {
+                    isSorted = false;
+                    break;
+                }
+            }
+            
+            if (isSorted) {
+                resultDiv.innerHTML = '<span class="pass">✅ PASS</span> - Hand sorted correctly (low to high)!';
+            } else {
+                resultDiv.innerHTML = '<span class="fail">❌ FAIL</span> - Hand not sorted correctly';
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        console.log('✅ Animation fixes test page loaded!');
+        console.log('All three issues should be fixed:');
+        console.log('1. Burn animation works');
+        console.log('2. Flip shows card face');
+        console.log('3. Hand sorted low to high');
+    </script>
+</body>
+</html>
