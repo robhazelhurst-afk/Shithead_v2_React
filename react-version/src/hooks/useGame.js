@@ -1,4 +1,4 @@
-// useGame.js - Custom hook for game state management
+// useGame.js - Custom hook with burn animation support - DEBUG VERSION
 import { useState, useEffect, useCallback } from 'react';
 import { GameState } from '../game/GameState';
 
@@ -8,10 +8,18 @@ export function useGame() {
   const [message, setMessage] = useState('');
   const [isHumanTurn, setIsHumanTurn] = useState(false);
   const [updateTrigger, setUpdateTrigger] = useState(0);
+  const [burnCards, setBurnCards] = useState(null); // Cards to animate for burn
+  const [screenShake, setScreenShake] = useState(false);
 
   // Force re-render function
   const forceUpdate = useCallback(() => {
     setUpdateTrigger(prev => prev + 1);
+  }, []);
+
+  // Trigger screen shake
+  const triggerScreenShake = useCallback(() => {
+    setScreenShake(true);
+    setTimeout(() => setScreenShake(false), 500);
   }, []);
 
   // Show a temporary message
@@ -28,6 +36,7 @@ export function useGame() {
     setSelectedCards([]);
     setMessage('');
     setIsHumanTurn(false);
+    setBurnCards(null);
   }, []);
 
   // Transition to playing phase
@@ -48,11 +57,84 @@ export function useGame() {
         }, 1000);
       }
     }
-  }, [gameState]);
+  }, [gameState, forceUpdate]);
+
+  // Handle playing selected cards (with optional override)
+  const handlePlayCards = useCallback((cardsOverride = null) => {
+    const cardsToPlay = cardsOverride || selectedCards;
+    
+    if (!gameState || !isHumanTurn || cardsToPlay.length === 0) return;
+
+    // Check if cards are valid
+    const topCard = gameState.discardPile.length > 0 
+      ? gameState.discardPile[gameState.discardPile.length - 1] 
+      : null;
+
+    // Check if all selected cards can be played
+    const allValid = cardsToPlay.every(card => gameState.canPlayCard(card, topCard));
+
+    if (!allValid) {
+      showMessage('Invalid play! Pick up the pile instead.', 2000);
+      setSelectedCards([]);
+      return;
+    }
+
+    // CAPTURE cards BEFORE playing (for burn animation)
+    const cardsForBurnAnimation = [...gameState.discardPile.slice(-3), ...cardsToPlay];
+
+    // Play the cards
+    const result = gameState.playCards(gameState.humanPlayer, cardsToPlay);
+    
+    setSelectedCards([]);
+    forceUpdate();
+
+    // Show feedback
+    if (result.burnOccurred) {
+      // Use the captured cards for animation
+      setBurnCards(cardsForBurnAnimation.slice(-4)); // Last 4 cards
+      triggerScreenShake();
+      
+      // Wait for animation, then continue
+      setTimeout(() => {
+        setBurnCards(null);
+        showMessage('🔥 Pile burned! Go again!', 2000);
+      }, 3000);
+    } else if (result.playedRank === 7) {
+      showMessage('7 played! Next must play 7 or lower', 2000);
+    } else if (result.playedRank === 2) {
+      showMessage('2 played! Pile reset', 2000);
+    }
+
+    // Check for game over
+    if (gameState.checkGameOver()) {
+      forceUpdate();
+      return;
+    }
+
+    // If player gets extra turn, don't switch
+    if (result.extraTurn) {
+      setIsHumanTurn(true);
+      return;
+    }
+
+    // Switch to AI turn
+    setIsHumanTurn(false);
+    gameState.switchPlayer();
+    
+    // Trigger AI turn after a delay
+    setTimeout(() => {
+      handleAITurn();
+    }, 1000);
+  }, [gameState, isHumanTurn, selectedCards, showMessage, forceUpdate, triggerScreenShake]);
 
   // Handle card double-click - auto-play if no duplicates in hand
   const handleCardDoubleClick = useCallback((card) => {
-    if (!gameState || !isHumanTurn || gameState.gamePhase !== 'playing') return;
+    console.log('🖱️ Double-click detected on:', card.displayName);
+    
+    if (!gameState || !isHumanTurn || gameState.gamePhase !== 'playing') {
+      console.log('❌ Cannot double-click: gameState:', !!gameState, 'isHumanTurn:', isHumanTurn, 'phase:', gameState?.gamePhase);
+      return;
+    }
 
     // Check if there are multiple cards of the same rank
     const playableCards = gameState.humanPlayer.hand.length > 0 
@@ -61,20 +143,25 @@ export function useGame() {
         ? gameState.humanPlayer.faceUpCards
         : gameState.humanPlayer.faceDownCards;
 
+    console.log('📋 Playable cards:', playableCards.map(c => c.displayName));
+    
     const sameRankCards = playableCards.filter(c => c.rank === card.rank);
+    console.log('🎴 Same rank cards (rank ' + card.rank + '):', sameRankCards.map(c => c.displayName));
 
     // If only one card of this rank, auto-play it
     if (sameRankCards.length === 1) {
+      console.log('✅ Only 1 card of this rank - AUTO-PLAYING!');
       // Select and play immediately
       setSelectedCards([card]);
       setTimeout(() => {
         handlePlayCards([card]);
       }, 50);
     } else {
+      console.log('⚠️ Multiple cards of same rank (' + sameRankCards.length + ') - just selecting');
       // Multiple cards of same rank, just select it
       handleCardClick(card);
     }
-  }, [gameState, isHumanTurn]);
+  }, [gameState, isHumanTurn, handlePlayCards]); // FIXED: Added handlePlayCards dependency
 
   // Handle card selection
   const handleCardClick = useCallback((card) => {
@@ -169,63 +256,6 @@ export function useGame() {
     });
   }, [gameState, isHumanTurn, selectedCards, showMessage, forceUpdate]);
 
-  // Handle playing selected cards (with optional override)
-  const handlePlayCards = useCallback((cardsOverride = null) => {
-    const cardsToPlay = cardsOverride || selectedCards;
-    
-    if (!gameState || !isHumanTurn || cardsToPlay.length === 0) return;
-
-    // Check if cards are valid
-    const topCard = gameState.discardPile.length > 0 
-      ? gameState.discardPile[gameState.discardPile.length - 1] 
-      : null;
-
-    // Check if all selected cards can be played
-    const allValid = cardsToPlay.every(card => gameState.canPlayCard(card, topCard));
-
-    if (!allValid) {
-      showMessage('Invalid play! Pick up the pile instead.', 2000);
-      setSelectedCards([]);
-      return;
-    }
-
-    // Play the cards
-    const result = gameState.playCards(gameState.humanPlayer, cardsToPlay);
-    
-    setSelectedCards([]);
-    forceUpdate();
-
-    // Show feedback
-    if (result.burnOccurred) {
-      showMessage('🔥 Pile burned! Go again!', 2000);
-    } else if (result.playedRank === 7) {
-      showMessage('7 played! Next must play 7 or lower', 2000);
-    } else if (result.playedRank === 2) {
-      showMessage('2 played! Pile reset', 2000);
-    }
-
-    // Check for game over
-    if (gameState.checkGameOver()) {
-      forceUpdate();
-      return;
-    }
-
-    // If player gets extra turn, don't switch
-    if (result.extraTurn) {
-      setIsHumanTurn(true);
-      return;
-    }
-
-    // Switch to AI turn
-    setIsHumanTurn(false);
-    gameState.switchPlayer();
-    
-    // Trigger AI turn after a delay
-    setTimeout(() => {
-      handleAITurn();
-    }, 1000);
-  }, [gameState, isHumanTurn, selectedCards, showMessage, forceUpdate]);
-
   // Handle picking up the pile
   const handlePickupPile = useCallback(() => {
     if (!gameState || !isHumanTurn || gameState.discardPile.length === 0) return;
@@ -274,6 +304,9 @@ export function useGame() {
 
     // AI plays cards
     setTimeout(() => {
+      // CAPTURE cards BEFORE playing (for burn animation)
+      const cardsForBurnAnimation = [...gameState.discardPile.slice(-3), ...cardsToPlay];
+      
       const result = gameState.playCards(gameState.aiPlayer, cardsToPlay);
       forceUpdate();
 
@@ -282,6 +315,15 @@ export function useGame() {
       
       if (result.burnOccurred) {
         msg += ' - Pile burned!';
+        
+        // Use the captured cards for animation
+        setBurnCards(cardsForBurnAnimation.slice(-4)); // Last 4 cards
+        triggerScreenShake();
+        
+        // Wait for animation
+        setTimeout(() => {
+          setBurnCards(null);
+        }, 3000);
       }
       
       showMessage(msg, 2000);
@@ -304,7 +346,7 @@ export function useGame() {
       setIsHumanTurn(true);
       gameState.switchPlayer();
     }, 1000);
-  }, [gameState, showMessage, forceUpdate]);
+  }, [gameState, showMessage, forceUpdate, triggerScreenShake]);
 
   return {
     gameState,
@@ -312,6 +354,8 @@ export function useGame() {
     message,
     isHumanTurn,
     updateTrigger,
+    burnCards,
+    screenShake,
     startNewGame,
     startPlayingPhase,
     handleCardClick,

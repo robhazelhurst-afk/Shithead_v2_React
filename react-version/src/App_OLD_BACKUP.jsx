@@ -1,8 +1,7 @@
-// App.jsx - Fixed layout with proper sizing and spacing
+// App.jsx - Main game component
 import { useState } from 'react';
 import Card from './components/Card';
 import HandDisplay from './components/HandDisplay';
-import BurnAnimation from './components/BurnAnimation';
 import { useGame } from './hooks/useGame';
 
 function App() {
@@ -12,8 +11,6 @@ function App() {
     message,
     isHumanTurn,
     updateTrigger,
-    burnCards,
-    screenShake,
     startNewGame,
     startPlayingPhase,
     handleCardClick,
@@ -40,10 +37,7 @@ function App() {
   );
   const isHumanMessage = message && !isAIMessage;
 
-  // INCREASED HEIGHT for more room and proper spacing
-  const PLAY_AREA_HEIGHT = 720;
-
-  // Setup phase
+  // Setup phase: Allow swapping cards between hand and face-up
   const renderSetupPhase = () => (
     <div className="min-h-screen bg-gradient-to-br from-green-800 via-green-900 to-slate-900 flex flex-col items-center justify-center p-8">
       <div className="max-w-4xl w-full bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl">
@@ -55,11 +49,13 @@ function App() {
           <p className="text-sm opacity-75">Keep your best cards in your hand.</p>
         </div>
 
+        {/* Face-down cards with face-up cards on top */}
         <div className="mb-8">
           <h3 className="text-white text-lg mb-4">Face-Up Cards (on Face-Down)</h3>
           <div className="flex gap-8 justify-center">
             {gameState.humanPlayer.faceUpCards.map((card, idx) => (
               <div key={card.id} className="relative">
+                {/* Face-down card underneath */}
                 <div className="absolute -bottom-2 -right-2 z-0">
                   <Card
                     card={gameState.humanPlayer.faceDownCards[idx]}
@@ -68,6 +64,7 @@ function App() {
                     disableAnimation={true}
                   />
                 </div>
+                {/* Face-up card on top */}
                 <div className="relative z-10">
                   <Card
                     card={card}
@@ -82,6 +79,7 @@ function App() {
           </div>
         </div>
 
+        {/* Hand */}
         <div className="mb-8">
           <h3 className="text-white text-lg mb-4">Your Hand</h3>
           <div className="flex gap-4 justify-center">
@@ -110,9 +108,9 @@ function App() {
     </div>
   );
 
-  // Playing phase - Fixed sizing and spacing
+  // Playing phase: Main game with FIXED grid layout
   const renderPlayingPhase = () => (
-    <div className={`min-h-screen bg-gradient-to-br from-green-800 via-green-900 to-slate-900 flex flex-col p-4 ${screenShake ? 'screen-shake' : ''}`} key={updateTrigger}>
+    <div className="min-h-screen bg-gradient-to-br from-green-800 via-green-900 to-slate-900 flex flex-col p-4" key={updateTrigger}>
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <div className="text-white">
@@ -134,255 +132,244 @@ function App() {
         </div>
       </div>
 
-      {/* Main game area - CENTERED with wider columns and taller height */}
-      <div className="flex-1 flex justify-center items-start">
-        <div className="grid grid-cols-[600px_1fr_600px] gap-4 w-full max-w-[1600px]">
+      {/* Main game area - FIXED 3-column grid */}
+      <div className="flex-1 grid grid-cols-[450px_1fr_450px] gap-4 max-w-7xl mx-auto w-full">
         
-          {/* LEFT COLUMN - AI Hand - 600px wide, 720px tall */}
-          <div className="flex flex-col" style={{ height: `${PLAY_AREA_HEIGHT}px` }}>
-            <div className="text-white text-center mb-2">
-              <p className="text-sm font-bold">AI Hand</p>
-              <p className="text-xs opacity-75">{gameState.aiPlayer.hand.length} cards</p>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <HandDisplay
-                cards={gameState.aiPlayer.hand}
-                isFaceDown={true}
-                isClickable={false}
-              />
-            </div>
+        {/* LEFT COLUMN - AI Hand (FIXED WIDTH 450px) */}
+        <div className="flex flex-col">
+          <div className="text-white text-center mb-2">
+            <p className="text-sm font-bold">AI Hand</p>
+            <p className="text-xs opacity-75">{gameState.aiPlayer.hand.length} cards</p>
           </div>
+          <div className="overflow-hidden">
+            <HandDisplay
+              cards={gameState.aiPlayer.hand}
+              isFaceDown={true}
+              isClickable={false}
+            />
+          </div>
+        </div>
 
-          {/* CENTER COLUMN - 720px tall with MORE SPACING */}
-          <div className="flex flex-col justify-between" style={{ height: `${PLAY_AREA_HEIGHT}px` }}>
+        {/* CENTER COLUMN - Main play area (FLEXIBLE) */}
+        <div className="flex flex-col justify-between">
           
-            {/* TOP SECTION - AI area with MORE SPACE */}
-            <div className="flex flex-col items-center">
-              {/* AI notification - 60px */}
-              <div className="flex items-center justify-center mb-4" style={{ height: '60px' }}>
-                {isAIMessage && (
-                  <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-lg shadow-xl animate-fade-in">
-                    <p className="text-gray-800 font-medium text-sm">{message}</p>
-                  </div>
-                )}
-              </div>
+          {/* AI Player area - table cards (FIXED HEIGHT) */}
+          <div className="h-48 flex flex-col items-center justify-start">
+            {/* AI notification zone - Fixed position above Computer text */}
+            <div className="h-16 flex items-center justify-center mb-2">
+              {isAIMessage && (
+                <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-lg shadow-xl animate-fade-in">
+                  <p className="text-gray-800 font-medium">{message}</p>
+                </div>
+              )}
+            </div>
             
-              {/* Computer title - 50px with MORE MARGIN */}
-              <div className="text-white text-center mb-6" style={{ height: '50px' }}>
-                <h2 className="text-xl font-bold">
-                  Computer {!isHumanTurn && '(Playing...)'}
-                </h2>
-                <p className="text-xs opacity-75">
-                  Cards: {gameState.aiPlayer.totalCards}
-                </p>
-              </div>
+            <div className="text-white text-center mb-2">
+              <h2 className="text-xl font-bold">
+                Computer {!isHumanTurn && '(Playing...)'}
+              </h2>
+              <p className="text-sm opacity-75">
+                Cards: {gameState.aiPlayer.totalCards}
+              </p>
+            </div>
 
-              {/* AI Face-up cards */}
-              <div className="flex gap-8 justify-center">
-                {gameState.aiPlayer.faceUpCards.length > 0 ? (
-                  gameState.aiPlayer.faceUpCards.map((card, idx) => (
-                    <div key={card.id} className="relative">
-                      {gameState.aiPlayer.faceDownCards[idx] && (
-                        <div className="absolute -bottom-2 -right-2 z-0">
-                          <Card
-                            isFaceDown={true}
-                            isClickable={false}
-                            disableAnimation={true}
-                          />
-                        </div>
-                      )}
-                      <div className="relative z-10">
+            {/* AI Face-down/face-up cards stacked */}
+            <div className="flex gap-8 justify-center">
+              {gameState.aiPlayer.faceUpCards.length > 0 ? (
+                gameState.aiPlayer.faceUpCards.map((card, idx) => (
+                  <div key={card.id} className="relative">
+                    {gameState.aiPlayer.faceDownCards[idx] && (
+                      <div className="absolute -bottom-2 -right-2 z-0">
                         <Card
-                          card={card}
+                          isFaceDown={true}
                           isClickable={false}
                           disableAnimation={true}
                         />
                       </div>
+                    )}
+                    <div className="relative z-10">
+                      <Card
+                        card={card}
+                        isClickable={false}
+                        disableAnimation={true}
+                      />
                     </div>
-                  ))
-                ) : gameState.aiPlayer.faceDownCards.length > 0 ? (
-                  gameState.aiPlayer.faceDownCards.map((_, idx) => (
-                    <Card
-                      key={`ai-facedown-${idx}`}
-                      isFaceDown={true}
-                      isClickable={false}
-                      disableAnimation={true}
-                    />
-                  ))
-                ) : null}
-              </div>
+                  </div>
+                ))
+              ) : gameState.aiPlayer.faceDownCards.length > 0 ? (
+                gameState.aiPlayer.faceDownCards.map((_, idx) => (
+                  <Card
+                    key={`ai-facedown-${idx}`}
+                    isFaceDown={true}
+                    isClickable={false}
+                    disableAnimation={true}
+                  />
+                ))
+              ) : null}
+            </div>
+          </div>
+
+          {/* Center area - Deck and Discard Pile (FIXED HEIGHT) */}
+          <div className="h-64 flex gap-8 items-center justify-center">
+            {/* Deck */}
+            <div className="text-center">
+              <p className="text-white text-sm mb-2">Deck</p>
+              {!gameState.deck.isEmpty() ? (
+                <Card isFaceDown={true} isClickable={false} disableAnimation={true} />
+              ) : (
+                <div className="w-24 h-36 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center bg-transparent">
+                  <p className="text-white/50 text-xs">Empty</p>
+                </div>
+              )}
+              <p className="text-white text-xs mt-2">{gameState.deck.size} cards</p>
             </div>
 
-            {/* MIDDLE SECTION - Pool and Discard with LABELS ABOVE */}
-            <div className="flex gap-8 items-center justify-center">
-              {/* Pool */}
-              <div className="text-center">
-                <p className="text-white text-sm mb-2 font-semibold">Pool</p>
-                {!gameState.deck.isEmpty() ? (
-                  <Card isFaceDown={true} isClickable={false} disableAnimation={true} />
-                ) : (
-                  <div className="w-24 h-36 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center bg-transparent">
-                    <p className="text-white/50 text-xs">Empty</p>
-                  </div>
-                )}
-                <p className="text-white text-xs mt-2">{gameState.deck.size}</p>
-              </div>
-
-              {/* Discard */}
-              <div className="text-center">
-                <p className="text-white text-sm mb-2 font-semibold">Discard</p>
-                {gameState.discardPile.length > 0 ? (
-                  <div className="relative" style={{ width: '96px', height: '144px' }}>
-                    {gameState.discardPile.slice(-3).map((card, idx) => (
-                      <div
-                        key={card.id}
-                        className="absolute"
-                        style={{
-                          left: idx > 0 ? `${idx * 2}px` : 0,
-                          top: idx > 0 ? `${idx * 2}px` : 0,
-                          zIndex: idx
-                        }}
-                      >
-                        <Card card={card} isClickable={false} disableAnimation={true} />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="w-24 h-36 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center bg-transparent">
-                    <p className="text-white/50 text-xs">Empty</p>
-                  </div>
-                )}
-                <p className="text-white text-xs mt-2">{gameState.discardPile.length}</p>
+            {/* Discard Pile */}
+            <div className="text-center">
+              <p className="text-white text-sm mb-2">Discard Pile</p>
+              {gameState.discardPile.length > 0 ? (
+                <div className="relative" style={{ width: '96px', height: '144px' }}>
+                  {gameState.discardPile.slice(-3).map((card, idx) => (
+                    <div
+                      key={card.id}
+                      className="absolute"
+                      style={{
+                        left: idx > 0 ? `${idx * 2}px` : 0,
+                        top: idx > 0 ? `${idx * 2}px` : 0,
+                        zIndex: idx
+                      }}
+                    >
+                      <Card card={card} isClickable={false} disableAnimation={true} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="w-24 h-36 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center bg-transparent">
+                  <p className="text-white/50 text-xs">Empty</p>
+                </div>
+              )}
+              <p className="text-white text-xs mt-2">{gameState.discardPile.length} cards</p>
               
-                {gameState.sevenEffectActive && (
-                  <p className="text-yellow-400 text-xs mt-1 font-bold">≤7</p>
-                )}
-                {gameState.nineThreshold && (
-                  <p className="text-purple-400 text-xs mt-1 font-bold">
-                    {gameState.nineThreshold === 'lower' ? '≤' : '≥'}9
-                  </p>
-                )}
-              </div>
+              {/* Special effects indicator */}
+              {gameState.sevenEffectActive && (
+                <p className="text-yellow-400 text-xs mt-1 font-bold">7 Effect: Play ≤7</p>
+              )}
+              {gameState.nineThreshold && (
+                <p className="text-purple-400 text-xs mt-1 font-bold">
+                  9 Effect: Play {gameState.nineThreshold === 'lower' ? '≤' : '≥'}9
+                </p>
+              )}
             </div>
+          </div>
 
-            {/* BOTTOM SECTION - Human area with MORE SPACE */}
-            <div className="flex flex-col items-center">
-              {/* Human Face-up cards */}
-              <div className="flex gap-8 justify-center mb-6">
-                {gameState.humanPlayer.faceUpCards.length > 0 ? (
-                  gameState.humanPlayer.faceUpCards.map((card, idx) => (
-                    <div key={card.id} className="relative">
-                      {gameState.humanPlayer.faceDownCards[idx] && (
-                        <div className="absolute -bottom-2 -right-2 z-0">
-                          <Card
-                            isFaceDown={true}
-                            isClickable={false}
-                            disableAnimation={true}
-                          />
-                        </div>
-                      )}
-                      <div className="relative z-10">
+          {/* Human Player area - table cards (FIXED HEIGHT) */}
+          <div className="h-64 flex flex-col items-center justify-end">
+            {/* Human Face-down/face-up cards stacked */}
+            <div className="flex gap-8 justify-center mb-4">
+              {gameState.humanPlayer.faceUpCards.length > 0 ? (
+                gameState.humanPlayer.faceUpCards.map((card, idx) => (
+                  <div key={card.id} className="relative">
+                    {gameState.humanPlayer.faceDownCards[idx] && (
+                      <div className="absolute -bottom-2 -right-2 z-0">
                         <Card
-                          card={card}
-                          isSelected={selectedCards.some(c => c.id === card.id)}
-                          isClickable={isHumanTurn && gameState.humanPlayer.hand.length === 0}
-                          onClick={handleCardClick}
-                          onDoubleClick={handleCardDoubleClick}
+                          isFaceDown={true}
+                          isClickable={false}
                           disableAnimation={true}
                         />
                       </div>
+                    )}
+                    <div className="relative z-10">
+                      <Card
+                        card={card}
+                        isSelected={selectedCards.some(c => c.id === card.id)}
+                        isClickable={isHumanTurn && gameState.humanPlayer.hand.length === 0}
+                        onClick={handleCardClick}
+                        onDoubleClick={handleCardDoubleClick}
+                        disableAnimation={true}
+                      />
                     </div>
-                  ))
-                ) : gameState.humanPlayer.faceDownCards.length > 0 ? (
-                  gameState.humanPlayer.faceDownCards.map((card, idx) => (
-                    <Card
-                      key={`human-facedown-${idx}`}
-                      card={card}
-                      isFaceDown={true}
-                      isSelected={selectedCards.some(c => c.id === card.id)}
-                      isClickable={isHumanTurn && gameState.humanPlayer.hand.length === 0}
-                      onClick={handleCardClick}
-                      onDoubleClick={handleCardDoubleClick}
-                      disableAnimation={true}
-                    />
-                  ))
-                ) : null}
-              </div>
-
-              {/* You title - 50px with MORE MARGIN */}
-              <div className="text-white text-center mb-4" style={{ height: '50px' }}>
-                <h2 className="text-xl font-bold">
-                  You {isHumanTurn && '(Your Turn)'}
-                </h2>
-                <p className="text-xs opacity-75">
-                  Cards: {gameState.humanPlayer.totalCards}
-                </p>
-              </div>
-
-              {/* Human notification - 60px */}
-              <div className="flex items-center justify-center" style={{ height: '60px' }}>
-                {isHumanMessage && (
-                  <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-lg shadow-xl animate-fade-in">
-                    <p className="text-gray-800 font-medium text-sm">{message}</p>
                   </div>
-                )}
-              </div>
+                ))
+              ) : gameState.humanPlayer.faceDownCards.length > 0 ? (
+                gameState.humanPlayer.faceDownCards.map((card, idx) => (
+                  <Card
+                    key={`human-facedown-${idx}`}
+                    card={card}
+                    isFaceDown={true}
+                    isSelected={selectedCards.some(c => c.id === card.id)}
+                    isClickable={isHumanTurn && gameState.humanPlayer.hand.length === 0}
+                    onClick={handleCardClick}
+                    onDoubleClick={handleCardDoubleClick}
+                    disableAnimation={true}
+                  />
+                ))
+              ) : null}
             </div>
-          </div>
 
-          {/* RIGHT COLUMN - Human Hand - 600px wide, 720px tall */}
-          <div className="flex flex-col" style={{ height: `${PLAY_AREA_HEIGHT}px` }}>
             <div className="text-white text-center mb-2">
-              <p className="text-sm font-bold">Your Hand</p>
-              <p className="text-xs opacity-75">{gameState.humanPlayer.hand.length} cards</p>
+              <h2 className="text-xl font-bold">
+                You {isHumanTurn && '(Your Turn)'}
+              </h2>
+              <p className="text-sm opacity-75">
+                Cards: {gameState.humanPlayer.totalCards}
+              </p>
             </div>
-          
-            {/* Hand display - flex-1 for remaining space */}
-            <div className="flex-1 overflow-hidden">
-              <HandDisplay
-                cards={gameState.humanPlayer.hand}
-                selectedCards={selectedCards}
-                isClickable={isHumanTurn}
-                onCardClick={handleCardClick}
-                onCardDoubleClick={handleCardDoubleClick}
-              />
+
+            {/* Human notification zone - Fixed position */}
+            <div className="h-16 flex items-center justify-center">
+              {isHumanMessage && (
+                <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-lg shadow-xl animate-fade-in">
+                  <p className="text-gray-800 font-medium">{message}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Buttons BELOW game area, aligned with right column */}
-      <div className="flex justify-center mt-4">
-        <div className="grid grid-cols-[600px_1fr_600px] gap-4 w-full max-w-[1600px]">
-          <div></div>
-          <div></div>
-          <div className="flex flex-col gap-3 items-center">
-            <button
-              onClick={() => handlePlayCards()}
-              disabled={!isHumanTurn || selectedCards.length === 0}
-              style={{ width: '300px' }}
-              className={`px-6 py-3 rounded-lg font-bold text-white transition-all ${
-                isHumanTurn && selectedCards.length > 0
-                  ? 'bg-green-600 hover:bg-green-700 shadow-lg'
-                  : 'bg-gray-600 opacity-50 cursor-not-allowed'
-              }`}
-            >
-              Play {selectedCards.length > 0 && `(${selectedCards.length})`}
-            </button>
-          
-            <button
-              onClick={handlePickupPile}
-              disabled={!isHumanTurn || gameState.discardPile.length === 0}
-              style={{ width: '300px' }}
-              className={`px-6 py-3 rounded-lg font-bold text-white transition-all ${
-                isHumanTurn && gameState.discardPile.length > 0
-                  ? 'bg-red-600 hover:bg-red-700 shadow-lg'
-                  : 'bg-gray-600 opacity-50 cursor-not-allowed'
-              }`}
-            >
-              Pick Up Pile
-            </button>
+        {/* RIGHT COLUMN - Human Hand (FIXED WIDTH 450px) */}
+        <div className="flex flex-col">
+          <div className="text-white text-center mb-2">
+            <p className="text-sm font-bold">Your Hand</p>
+            <p className="text-xs opacity-75">{gameState.humanPlayer.hand.length} cards</p>
           </div>
+          <div className="flex-1 overflow-hidden flex flex-col justify-center">
+            <HandDisplay
+              cards={gameState.humanPlayer.hand}
+              selectedCards={selectedCards}
+              isClickable={isHumanTurn}
+              onCardClick={handleCardClick}
+              onCardDoubleClick={handleCardDoubleClick}
+            />
+          </div>
+          
+          {/* Action buttons - Fixed at bottom of hand area */}
+          {isHumanTurn && (
+            <div className="flex flex-col gap-3 mt-4">
+              <button
+                onClick={() => handlePlayCards()}
+                disabled={selectedCards.length === 0}
+                className={`w-full px-6 py-3 rounded-lg font-bold text-white transition-all ${
+                  selectedCards.length > 0
+                    ? 'bg-green-600 hover:bg-green-700 shadow-lg'
+                    : 'bg-gray-600 opacity-50 cursor-not-allowed'
+                }`}
+              >
+                Play {selectedCards.length > 0 && `(${selectedCards.length})`}
+              </button>
+              
+              <button
+                onClick={handlePickupPile}
+                disabled={gameState.discardPile.length === 0}
+                className={`w-full px-6 py-3 rounded-lg font-bold text-white transition-all ${
+                  gameState.discardPile.length > 0
+                    ? 'bg-red-600 hover:bg-red-700 shadow-lg'
+                    : 'bg-gray-600 opacity-50 cursor-not-allowed'
+                }`}
+              >
+                Pick Up Pile
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -552,13 +539,6 @@ function App() {
             </div>
           </div>
         )}
-              {/* Burn Animation Overlay - ADD THIS ENTIRE SECTION */}
-      {burnCards && (
-        <BurnAnimation 
-          cards={burnCards} 
-          onComplete={() => {/* cleanup handled in useGame */}} 
-        />
-      )}
       </div>
     );
   }
